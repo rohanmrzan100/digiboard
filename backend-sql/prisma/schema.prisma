@@ -1,0 +1,62 @@
+// npx prisma migrate dev --name init
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @unique @default(uuid())
+  name      String
+  email     String     @unique
+  password  String
+  device    Device[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  Media     Media[]
+  Playlist  Playlist[]
+}
+
+model Device {
+  id        String     @id @unique @default(uuid())
+  name      String
+  uid       String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  change    Boolean
+  user      User       @relation(fields: [owner_id], references: [id])
+  owner_id  String
+  Playlist  Playlist[]
+}
+
+model UniqueId {
+  id  String @id @unique @default(uuid())
+  uid String
+}
+
+model Media {
+  id        String     @id @unique @default(uuid())
+  media     String
+  type      String
+  createdAt DateTime   @default(now())
+  name      String
+  user      User       @relation(fields: [owner_id], references: [id])
+  owner_id  String
+  Playlist  Playlist[]
+}
+
+model Playlist {
+  id        String   @id @unique @default(uuid())
+  type      String
+  createdAt DateTime @default(now())
+  name      String
+  device    Device   @relation(fields: [device_id], references: [id])
+  device_id String
+  media     Media    @relation(fields: [media_id], references: [id])
+  media_id  String
+  user      User     @relation(fields: [owner_id], references: [id])
+  owner_id  String
+}
